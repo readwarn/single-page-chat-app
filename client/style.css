@@ -1,0 +1,343 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    font-family: 'Noto Sans', sans-serif;
+    overflow-y: hidden;
+}
+div#app{
+    height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+}
+div.modal-container{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(109, 109, 228, 0.8);
+}
+div.modal-container.loader{
+    z-index: 999;
+    background: #fffffe;
+}
+div.modal{
+    width: 80%;
+    border: 1.5px solid black;
+    border-radius: 5px;
+    padding: 15px;
+    background: #d1d1e9;
+}
+div.modal input{
+    margin: 15px 0;
+}
+div.modal button{
+    background:#6246ea;
+    color: white;
+    cursor: pointer;
+}
+button p{
+    margin-right:7px;
+}
+button span{
+    display: flex;
+    justify-content: center;
+}
+div.modal button,div.modal input{
+    width: 100%;
+    height: 36px;
+    border: 0;
+    outline: 0;
+    border-radius: 5px;
+    padding: 0 15px;
+}
+section{
+    width: 100%;
+    position: absolute;
+}
+section.a{
+    height: 100%;
+    background-color:#f8f5f2;
+}
+section.a.hide,section.b.hide{
+    display: none;
+}
+div.tabs{
+    position: absolute;
+    width: 100%;
+    height:100%;
+    display: flex;
+    flex-direction: column;
+}
+nav{
+    padding: 15px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+nav img{
+    cursor: pointer;
+    margin-right: 3px;
+}
+nav.footer{
+    height: 45px;
+    margin-top: auto;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: #d1d1e9;
+}
+nav.footer div.icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+div.icon img{
+    transform: translateX(7px);
+}
+div.icon div{
+    width: 12px;
+    height: 12px;
+    background: transparent;
+    border-radius: 100%;
+}
+nav.footer div.icon.picked{
+    border: #6246ea 2px solid;
+}
+div.icon div.new{
+    background: rgb(248, 81, 3);
+    transform: translate(1px, -12px);
+}
+section.b nav{
+    border-bottom: 2px solid #2b2c34;
+}
+section.b nav div.back p{
+    font-weight: 700;
+    text-transform: capitalize;
+    font-weight: 1.1rem;
+}
+nav div.dot{
+    width: 10px;
+    height: 10px;
+    background: #6246ea;
+    border: #d1d1e9 1px solid;
+    border-radius: 100%;
+}
+nav div.back{
+    display: flex;
+    align-items: center;
+    width: 10%;
+    cursor: pointer;
+}
+nav div.back p{
+    margin-right: 5px;
+}
+nav img.back{
+    margin-right: 5px;
+}
+nav p.note{
+    text-align: center;
+}
+div.search{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    border-radius: 10px;
+    background: #d1d1e9;
+    width: calc(100% - 15px);
+    padding: 0 15px;
+    margin: 15px auto;
+}
+div.search input{
+    width: calc(100% - 24px);
+    outline: 0;
+    height: 100%;
+    border: 0;
+    background: transparent;
+}
+div.tab-container{
+    overflow: scroll;
+    -ms-overflow-style: none;  
+    height: 78%;
+    width: 100%;
+    margin: auto;
+}
+div.tab-container::-webkit-scrollbar {
+    display: none;
+}
+div.tab{
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;
+}
+div.tab:hover{
+    background:#d1d1e9;
+}
+div.tab div.info{
+    width: 89%;
+}
+div.tab img.avi{
+    margin-right: 12px;
+    border-radius: 100%;
+}
+div.tab div img{
+    display: block;
+    margin: auto;
+}
+div.tab div img:hover{
+    transform: scale(1.1);
+    filter: brightness(0.7);
+}
+div.tab p.req{
+    font-size: 0.85rem;
+    width: 50%;
+    font-weight: 700;
+}
+div.tab div.option{
+   margin-right: 1px; 
+   margin-left: auto;
+}
+div.tab div.option p{
+    font-size: 0.65rem;
+}
+div.info h4{
+    font-size: 0.9rem;
+    text-transform: capitalize;
+}
+div.info p{
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+section.b{
+    background: #fffffe;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+}
+div.message-container{
+    height: 100%;
+    padding: 15px 0px;
+    width: 90%;
+    margin: auto;
+    overflow: scroll;
+    -ms-overflow-style: none; 
+}
+div.message-container::-webkit-scrollbar {
+    display: none;
+}
+div.message{
+    margin-bottom: 10px;
+    display: flex;
+    padding: 0 2.5%;
+}
+div.message p{
+    font-size: 0.85rem;
+    line-height: 180%;
+    padding: 10px;
+    min-width: 80px;
+    background:#6246ea;
+    color: #fffffe;
+    border-radius: 7px;
+}
+div.message.mine{
+    margin-left: auto;
+    justify-content: flex-end;
+}
+div.message.mine p{
+    background:#f8f5f2;
+    color: #2b2c34;
+}
+div.input-box{
+    width: 90%;
+    height: 40px;
+    margin: auto auto 0 auto;
+    background:#6246ea;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 10px;
+    border-radius: 7px;
+}
+div.input-box button{
+     border: 0;
+     outline: 0;
+     background: transparent;
+     cursor: pointer;
+}
+div.input-box img:hover{
+    filter: brightness(0.85);
+}
+div.input-box button:disabled{
+    filter: brightness(0.4);
+    cursor: not-allowed;
+}
+div.input-box input::placeholder{
+    font-size: 0.85rem;
+    color: #fffffe;
+}
+div.input-box input{
+    width: calc(100% - 40px);
+    height: 100%;
+    outline: 0;
+    border: 0;
+    padding: 13px;
+    background: transparent;
+    font-size: 0.9rem;
+    color: #fffffe;
+}
+img#back{
+    display: block;
+}
+p.error{
+    color: #e78310;
+    font-size: 0.8rem;
+}
+p.connect{
+    padding: 1.3px;
+    text-align: center;
+    background: #6246ea;
+    color: #fffffe;
+}
+@media screen and (min-width:900px) {
+    section{
+        position: relative;
+    }
+    section.a{
+        width: 25%;
+    }
+    section.a.hide,section.b.hide{
+        display: flex;
+        flex-direction: column;
+    }
+    section.b{
+        width: 75%;
+    }
+    div.tab div.info{
+        width: 82%;
+    }
+    img#back{
+        display: none;
+    }
+    div.tab p.req{
+        width: 40%;
+    }
+    div.modal{
+        width: 50%;
+    }
+}
