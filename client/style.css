@@ -147,8 +147,8 @@ nav img.back{
 }
 section.b nav p.note{
     text-align: center;
-    color: #6246ea;
-    border: #e78310 1px solid;
+    color: #2b2c34;
+    width: 100%;
 }
 div.search{
     display: flex;
@@ -307,7 +307,7 @@ img#back{
     display: block;
 }
 p.error{
-    color: #e78310;
+    color: #f12112;
     font-size: 0.8rem;
 }
 p.connect{
