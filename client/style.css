@@ -145,8 +145,10 @@ nav div.back p{
 nav img.back{
     margin-right: 5px;
 }
-nav p.note{
+section.b nav p.note{
     text-align: center;
+    color: #6246ea;
+    border: #e78310 1px solid;
 }
 div.search{
     display: flex;
