@@ -17,7 +17,7 @@ const app = new Vue({
     chats: [],
     currentChat: "",
     disconnected: true,
-    socket: io("https://single-page-chat-app-steel.vercel.app"),
+    socket: io("https://single-page-chat-app-steel.vercel.app/socket.io"),
     child: "",
     parent: "",
     newChatM: false,
