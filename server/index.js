@@ -23,7 +23,7 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
   res.header(
     "Access-Control-Allow-Origin",
-    "https://app.netlify.com/sites/ecstatic-hugle-48075c"
+    "https://ecstatic-hugle-48075c.netlify.app"
   );
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header(
@@ -49,7 +49,7 @@ const server = app.listen(process.env.PORT || 3000, () => {
 
 const io = socket(server, {
   cors: {
-    origin: "https://app.netlify.com/sites/ecstatic-hugle-48075c",
+    origin: "https://ecstatic-hugle-48075c.netlify.app",
     methods: ["GET", "PUT", "POST"],
   },
 });
