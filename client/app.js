@@ -1,9 +1,12 @@
+axios.defaults.baseURL = "https://single-page-chat-app-steel.vercel.app";
 const app = new Vue({
   el: "#app",
   data: {
+    search: "",
     error: "",
     message: "",
     username: "",
+    owner: "",
     userID: "",
     friend: "",
     loading: true,
@@ -15,9 +18,10 @@ const app = new Vue({
     chatbox: false,
     requests: [],
     chats: [],
+    filterChats: [],
     currentChat: "",
     disconnected: true,
-    socket: io("https://single-page-chat-app-steel.vercel.app/socket.io"),
+    socket: io("https://single-page-chat-app-steel.vercel.app"),
     child: "",
     parent: "",
     newChatM: false,
@@ -28,7 +32,7 @@ const app = new Vue({
       if (!value) {
         return "";
       }
-      return value.substring(0, 23);
+      return value.substring(0, 25);
     },
   },
   methods: {
@@ -48,49 +52,45 @@ const app = new Vue({
     friending() {
       this.friendModal = false;
       this.requesting = false;
+      this.error = "";
     },
     requestUser(userID, friend) {
       this.requesting = true;
-      axios
-        .post("https://single-page-chat-app-steel.vercel.app/request", {
-          from: userID,
-          for: friend,
-        })
-        .then((res) => {
-          this.requesting = false;
-          if (res.data.userExist !== undefined) {
-            this.error = "User doesnt exist";
-          } else if (res.data.weird) {
-            this.error = "You can't be friend with yourself [you can actually]";
-          } else if (res.data.requestExist) {
-            this.error = `Similar request exists`;
-          } else {
-            this.sendRequest(res.data, res.data.for, res.data.from);
-            this.friendModal = false;
-            this.error = "";
-          }
-        });
+      axios.post("/request", { from: userID, for: friend }).then((res) => {
+        this.requesting = false;
+        if (res.data.userExist !== undefined) {
+          this.error = "User doesnt exist";
+        } else if (res.data.weird) {
+          this.error = "You can't be friend with yourself [you can actually]";
+        } else if (res.data.requestExist) {
+          this.error = `Similar request exists`;
+        } else {
+          this.sendRequest(res.data, res.data.for, res.data.from);
+          this.friendModal = false;
+          this.error = "";
+        }
+      });
     },
     createUser(username) {
-      if (username.length < 5) {
-        this.error = "Username should be more tha 4 characters";
+      if (username.length < 4) {
+        this.error = "Username should be more tha 3 characters";
       } else {
+        this.error = "";
         this.choosing = true;
-        axios
-          .post("https://single-page-chat-app-steel.vercel.app/user", {
-            username: username,
-          })
-          .then((res) => {
-            if (res.data.usernameExist) {
-              this.choosing = false;
-              this.error = "Username taken";
-            } else {
-              localStorage.setItem("userID", res.data._id);
-              this.userID = res.data._id;
-              this.registerSocket(this.userID);
-              this.loginModal = false;
-            }
-          });
+        axios.post("/user", { username: username }).then((res) => {
+          if (res.data.usernameExist) {
+            this.choosing = false;
+            this.error = "Username taken";
+          } else {
+            localStorage.setItem("userID", res.data.user._id);
+            this.userID = res.data.user._id;
+            this.owner = res.data.user.username;
+            this.chats.push(res.data.chat);
+            this.currentChat = res.data.chat;
+            this.registerSocket(this.userID);
+            this.loginModal = false;
+          }
+        });
       }
     },
     acceptRequest(request, index) {
@@ -99,22 +99,19 @@ const app = new Vue({
         between: [request.from._id, request.for],
         id: request._id,
       };
-      axios
-        .post("https://single-page-chat-app-steel.vercel.app/chat", payload)
-        .then((res) => {
-          const id1 = res.data.between[0];
-          const id2 = res.data.between[1];
-          this.newChat(res.data, id1._id, id2._id);
-          this.chats.push(res.data);
-        });
+      axios.post("/chat", payload).then((res) => {
+        const id1 = res.data.between[0];
+        const id2 = res.data.between[1];
+        this.registerChat(res.data);
+        this.newChat(res.data, id1._id, id2._id);
+        this.chats.push(res.data);
+      });
     },
     declineRequest(id, index) {
       this.requests.splice(index, 1);
-      axios
-        .delete(`https://single-page-chat-app-steel.vercel.app/request/${id}`)
-        .then((res) => {
-          console.log(res.data);
-        });
+      axios.delete(`/request/${id}`).then((res) => {
+        console.log(res.data);
+      });
     },
     updateChatbox(index) {
       this.chatbox = true;
@@ -129,8 +126,14 @@ const app = new Vue({
           owner: this.userID,
           content: message,
         };
+        const mockMessage = {
+          owner: {
+            username: this.owner,
+          },
+          content: message,
+        };
         this.message = "";
-        this.currentChat.messages.push(payload);
+        this.currentChat.messages.push(mockMessage);
         this.chats.splice(0, 1, this.currentChat);
         this.$nextTick(() => {
           const parent = document.querySelector("div.message-container");
@@ -138,25 +141,18 @@ const app = new Vue({
           const diff = child.clientHeight + 20 - parent.clientHeight;
           parent.scrollTop = diff;
         });
-        const party1ID = this.currentChat.between[0]._id;
-        const party2ID = this.currentChat.between[1]._id;
-        this.socket.emit("messageSent", {
-          chat: this.currentChat,
-          id1: party1ID,
-          id2: party2ID,
+        this.socket.emit("messageSent", this.currentChat);
+        axios.post(`/message/${this.currentChat._id}`, payload).then((res) => {
+          // this.chats[0]=res.data;
+          res;
         });
-        axios
-          .post(
-            `https://single-page-chat-app-steel.vercel.app/message/${this.currentChat._id}`,
-            payload
-          )
-          .then((res) => {
-            this.chats[0] = res.data;
-          });
       }
     },
     registerChats(chats) {
-      this.socket.emit("registerAll", chats);
+      this.socket.emit("registerChats", chats);
+    },
+    registerChat(chat) {
+      this.socket.emit("registerChat", chat);
     },
     registerSocket(id) {
       this.socket.emit("register", id);
@@ -199,6 +195,7 @@ const app = new Vue({
     });
     this.socket.on("newChat", (chat) => {
       this.chats.push(chat);
+      this.registerChat(chat);
       this.newChatM = true;
     });
     this.socket.on("messageReceived", (chat) => {
@@ -206,8 +203,7 @@ const app = new Vue({
       const parent = document.querySelector("div.message-container");
       const child = document.querySelector("div.tight");
       let diff = child.clientHeight - parent.clientHeight - parent.scrollTop;
-      console.log("diff", diff);
-      if (diff > -32) {
+      if (diff > -20) {
         this.$nextTick(() => {
           parent.scrollTop = child.clientHeight + 20 - parent.clientHeight;
         });
@@ -215,38 +211,28 @@ const app = new Vue({
     });
     this.userID = localStorage.getItem("userID");
     if (this.userID) {
-      axios
-        .get(
-          `https://single-page-chat-app-steel.vercel.app/user/${this.userID}`
-        )
-        .then((res) => {
-          if (!res.data) {
-            this.loading = false;
-            this.loginModal = true;
-          } else {
-            localStorage.setItem("userID", res.data._id);
-            this.userID = res.data._id;
-            this.registerSocket(this.userID);
-            axios
-              .get(
-                `https://single-page-chat-app-steel.vercel.app/request/${this.userID}`
-              )
-              .then((res) => {
-                this.requests = res.data;
-                axios
-                  .get(
-                    `https://single-page-chat-app-steel.vercel.app/chat/${this.userID}`
-                  )
-                  .then((res) => {
-                    this.chats = res.data;
-                    this.currentChat = res.data[0];
-                    this.loading = false;
-                    this.loginModal = false;
-                  });
-              });
-            this.loginModal = true;
-          }
-        });
+      axios.get(`/user/${this.userID}`).then((res) => {
+        if (!res.data) {
+          this.loading = false;
+          this.loginModal = true;
+        } else {
+          localStorage.setItem("userID", res.data._id);
+          this.owner = res.data.username;
+          this.userID = res.data._id;
+          this.registerSocket(this.userID);
+          axios.get(`/request/${this.userID}`).then((res) => {
+            this.requests = res.data;
+            axios.get(`/chat/${this.userID}`).then((res) => {
+              this.chats = res.data;
+              this.registerChats(res.data);
+              this.currentChat = res.data[0];
+              this.loading = false;
+              this.loginModal = false;
+            });
+          });
+          this.loginModal = true;
+        }
+      });
     } else {
       this.loading = false;
       this.loginModal = true;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,9 +11,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ==" crossorigin="anonymous"></script>
     <title>Cap Chat</title>
 </head>
+
 <body>
     <div id="app">
-         <div class="modal-container loader" v-if="loginModal">
+        <div class="modal-container loader" v-if="loginModal">
             <div class="modal">
                 <h3>Set A Username</h3>
                 <input type="text" placeholder="username" v-model="username">
@@ -22,8 +24,8 @@
                 </button>
                 <p class="error">{{error}}</p>
             </div>
-         </div>
-         <div class="modal-container" v-if="friendModal" @click.self="friending()">
+        </div>
+        <div class="modal-container" v-if="friendModal" @click.self="friending()">
             <div class="modal">
                 <h3>Add Friend</h3>
                 <input type="text" placeholder="username" v-model="friend">
@@ -33,35 +35,55 @@
                 </button>
                 <p class="error">{{error}}</p>
             </div>
-         </div>
-         <div class="modal-container loader" v-if="loading" @click.self="friendModal=false">
-             <p>Loading</p>
-             <img src="https://s2.svgbox.net/loaders.svg?ic=tail-spin&color=080808" width="32" height="32">
-         </div>
-         <section class="a" :class="{'hide':chatbox}" v-if="!loading">
-             <div class="tabs" v-if="chat">
-                 <nav>
-                    <h3>Chats</h3>
-                    <div class="dot">
+        </div>
+        <div class="modal-container loader" v-if="loading" @click.self="friendModal=false">
+            <p>Loading</p>
+            <img src="https://s2.svgbox.net/loaders.svg?ic=tail-spin&color=080808" width="32" height="32">
+        </div>
+        <section class="a" :class="{'hide':chatbox}" v-if="!loading">
+            <div class="tabs" v-if="chat">
+                <nav>
+                    <p>Chats</p>
+                    <div class="right">
+                        <p>{{owner}}</p>
+                        <div class="dot">
 
+                        </div>
                     </div>
-                 </nav>
-                 <div class="search">
-                    <input type="text" placeholder="search contact">
+                </nav>
+                <div class="search">
+                    <input type="text" v-model="search" placeholder="search contact">
                     <img src="https://s2.svgbox.net/hero-outline.svg?ic=search&color=000" width="20" height="20">
-                 </div>
-                 <div class="tab-container">
+                </div>
+                <div class="tab-container">
                     <div class="tab" v-for="(chat,index) in chats" :key="index">
                         <img src="./avatar.svg" width="40" height="40" class="avi">
-                         <div class="info" @click="updateChatbox(index)">
-                             <h4 v-if="user._id!==userID" v-for="(user,index) in chat.between" :key=index>{{user.username}}</h4>
-                             <p v-if="chat.messages.length>0">{{(chat.messages[(chat.messages.length-1)].content) | trim}}...</p>
-                             <p v-if="chat.messages.length===0">Start Messaging</p>
-                         </div>
-                     </div>
-                 </div>
-                 <nav class="footer">
+                        <div class="info" @click="updateChatbox(index)">
+                            <h4 v-if="user._id!==userID && chat.dm" v-for="(user,index) in chat.between" :key=index>{{user.username}}</h4>
+                            <h4 v-if="!chat.dm">{{chat.name}}</h4>
+                            <p v-if="chat.messages.length>0">{{(chat.messages[(chat.messages.length-1)].content) | trim}}...</p>
+                            <p v-if="chat.messages.length===0">Start Messaging</p>
+                        </div>
+                    </div>
+                </div>
+                <nav class="footer">
                     <div class="icon" @click="chatter('chat')" :class="{'picked':chat}">
+                        <!-- <img v-if="0" src="https://s2.svgbox.net/hero-outline.svg?ic=chat&color=000" width="22" height="22"> -->
+                        <p class="footer-link">Chats</p>
+                        <!-- <div v-if="0" :class="{'new':newChatM}"></div> -->
+                    </div>
+                    <div class="icon" title="friend request" @click="chatter('friend')" :class="{'picked':!chat}">
+                        <p class="footer-link">Requests</p>
+                        <!-- <img v-if="0" src="https://s2.svgbox.net/hero-outline.svg?ic=user-add&color=000" width="22" height="22"> -->
+                        <!-- <div v-if="0" :class="{'new':newFriend}"></div> -->
+                    </div>
+                    <div class="icon add" title="add new contact" @click="friendModal=true" :class="{'picked':friendModal}">
+                        <p class="footer-link">Add user</p>
+                        <!-- <img src="https://s2.svgbox.net/materialui.svg?ic=add&color=000" width="22" height="22"> -->
+                        <!-- <div v-if="0"></div> -->
+                    </div>
+
+                    <!-- <div class="icon" @click="chatter('chat')" :class="{'picked':chat}">
                         <img src="https://s2.svgbox.net/hero-outline.svg?ic=chat&color=000" width="22" height="22">
                         <div :class="{'new':newChatM}"></div>
                     </div>
@@ -72,70 +94,74 @@
                     <div class="icon" title="add new contact" @click="friendModal=true" :class="{'picked':friendModal}">
                         <img src="https://s2.svgbox.net/materialui.svg?ic=add&color=000" width="22" height="22">
                         <div></div>
-                    </div>
-                 </nav>
-             </div>
-             <div class="tabs" v-if="!chat">
-                 <nav>
-                    <h3>Friend Requests</h3>
+                    </div> -->
+                </nav>
+            </div>
+            <div class="tabs" v-if="!chat">
+                <nav>
+                    <p>Friend Requests</p>
                     <div class="dot">
 
                     </div>
-                 </nav>
-                 <div class="tab-container">
+                </nav>
+                <div class="tab-container">
                     <div class="tab b" v-for="(request,index) in requests" :key="index" v-if="!request.accepted">
                         <img src="./avatar.svg" width="40" height="40" class="avi">
-                         <p class="req">{{request.from.username}}</p>
-                         <div class="option">
+                        <p class="req">{{request.from.username}}</p>
+                        <div class="option">
                             <img @click="acceptRequest(request,index)" src="https://s2.svgbox.net/octicons.svg?ic=check-circle&color=23e092" class="option" width="17" height="17">
                             <p>Accept</p>
-                         </div>
-                         <div class="option">
-                            <img  @click="declineRequest(request._id,index)" src="https://s2.svgbox.net/octicons.svg?ic=x-circle&color=f01641"  class="option" width="17" height="17">
+                        </div>
+                        <div class="option">
+                            <img @click="declineRequest(request._id,index)" src="https://s2.svgbox.net/octicons.svg?ic=x-circle&color=f01641" class="option" width="17" height="17">
                             <p>Decline</p>
-                         </div>
-                     </div>
-                 </div>
-                 <nav class="footer">
+                        </div>
+                    </div>
+                </div>
+                <nav class="footer">
                     <div class="icon" @click="chatter('chat')" :class="{'picked':chat}">
-                        <img src="https://s2.svgbox.net/hero-outline.svg?ic=chat&color=000" width="22" height="22">
-                        <div :class="{'new':newChatM}"></div>
+                        <!-- <img v-if="0" src="https://s2.svgbox.net/hero-outline.svg?ic=chat&color=000" width="22" height="22"> -->
+                        <p class="footer-link">Chats</p>
+                        <!-- <div v-if="0" :class="{'new':newChatM}"></div> -->
                     </div>
                     <div class="icon" title="friend request" @click="chatter('friend')" :class="{'picked':!chat}">
-                        <img src="https://s2.svgbox.net/hero-outline.svg?ic=user-add&color=000" width="22" height="22">
-                        <div :class="{'new':newFriend}"></div>
+                        <p class="footer-link">Requests</p>
+                        <!-- <img v-if="0" src="https://s2.svgbox.net/hero-outline.svg?ic=user-add&color=000" width="22" height="22"> -->
+                        <!-- <div v-if="0" :class="{'new':newFriend}"></div> -->
                     </div>
                     <div class="icon add" title="add new contact" @click="friendModal=true" :class="{'picked':friendModal}">
-                        <img src="https://s2.svgbox.net/materialui.svg?ic=add&color=000" width="22" height="22">
-                        <div></div>
+                        <p class="footer-link">Add user</p>
+                        <!-- <img src="https://s2.svgbox.net/materialui.svg?ic=add&color=000" width="22" height="22"> -->
+                        <!-- <div v-if="0"></div> -->
                     </div>
-                 </nav>
-             </div>
-         </section>
-         <section class="b" :class="{'hide':!chatbox}" v-if="!loading">
-                <nav>
-                  <p v-if="chats.length===0" class="note">NO CONTACTS YET..CLICK ON THE + ICON TO ADD FRIENDS BASED ON THEIR USERNAME</p>
-                  <div  class="back" @click="chatbox=false" v-if="currentChat">
-                    <img src="https://s2.svgbox.net/octicons.svg?ic=chevron-left&color=000" width="22" height="22"  class="back" id="back">
-                    <p v-if="user._id!==userID && currentChat" v-for="(user,index) in currentChat.between">{{user.username}}</p>
-                  </div>
-                 </nav>
-                  <p v-if="disconnected" class="connect">disconnected</p>
-                  <div class="message-container" v-if="currentChat">
-                     <div class="tight">
-                        <div class="message" v-for="(message,index) in currentChat.messages" :key=index class="message" :class="{'mine':message.owner===userID}">
-                            <p>{{message.content}}</p>
-                          </div>
-                     </div>
-                  </div>
-                  <div class="input-box">
-                     <input type="text" v-model="message" v-on:keyup.enter="sendMessage(message)">
-                     <button :disabled="message===''" @click="sendMessage(message)">
+                </nav>
+            </div>
+        </section>
+        <section class="b" :class="{'hide':!chatbox}" v-if="!loading">
+            <nav id="b">
+                <div class="back" @click="chatbox=false" v-if="currentChat">
+                    <img src="https://s2.svgbox.net/octicons.svg?ic=chevron-left&color=000" width="22" height="22" class="back" id="back">
+                    <p v-if="currentChat.dm && user._id!==userID" v-for="(user,index) in currentChat.between">{{user.username}}</p>
+                    <p v-if="!currentChat.dm">{{currentChat.name}}</p>
+                </div>
+            </nav>
+            <p v-if="disconnected" class="connect">disconnected</p>
+            <div class="message-container" v-if="currentChat">
+                <div class="tight">
+                    <div class="message" v-for="(message,index) in currentChat.messages" :key=index class="message" :class="{'mine':message.owner.username===owner}">
+                        <p><span v-if="owner!==message.owner.username">{{message.owner.username}}</span> <br v-if="owner!==message.owner.username"> {{message.content}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="input-box">
+                <input type="text" v-model="message" v-on:keyup.enter="sendMessage(message)">
+                <button :disabled="message===''" @click="sendMessage(message)">
                         <img src="https://s2.svgbox.net/materialui.svg?ic=send&color=fff" width="30" height="30">
                      </button>
-                  </div>
-         </section>
+            </div>
+        </section>
     </div>
- <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
+
 </html>
