@@ -1,4 +1,4 @@
-axios.defaults.baseURL = "https://single-page-chat-app-steel.vercel.app";
+axios.defaults.baseURL = "https://single-page-chat-app.onrender.com";
 const app = new Vue({
   el: "#app",
   data: {
@@ -21,7 +21,7 @@ const app = new Vue({
     filterChats: [],
     currentChat: "",
     disconnected: true,
-    socket: io("https://single-page-chat-app-steel.vercel.app"),
+    socket: io("https://single-page-chat-app.onrender.com"),
     child: "",
     parent: "",
     newChatM: false,
