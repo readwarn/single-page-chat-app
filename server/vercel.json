@@ -12,7 +12,7 @@
     },
     {
       "src": "/socket.io",
-      "dest": "http://localhost:3000"
+      "dest": "https://single-page-chat-app-steel.vercel.app"
     }
   ]
 }
