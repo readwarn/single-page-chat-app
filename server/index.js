@@ -23,12 +23,12 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
   res.header(
     "Access-Control-Allow-Origin",
-    "https://ecstatic-hugle-48075c.netlify.app"
+    "https://app.netlify.com/sites/ecstatic-hugle-48075c"
   );
-  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header(
     "Access-Control-Allow-Headers",
-    "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept"
+    "Access-Control-Allow-Headers, Origin, Authorization, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
   );
   next();
 });
@@ -38,7 +38,9 @@ app.use("/request", request);
 app.use("/chat", chat);
 app.use("/message", message);
 app.get("/", (req, res) => {
-  res.json({ name: "rilwan" });
+  res.json({
+    name: "Im avaialable for tech jobs. Email: akinyusuf5@gmail.com",
+  });
 });
 
 const server = app.listen(process.env.PORT || 3000, () => {
@@ -47,7 +49,7 @@ const server = app.listen(process.env.PORT || 3000, () => {
 
 const io = socket(server, {
   cors: {
-    origin: "https://ecstatic-hugle-48075c.netlify.app",
+    origin: "https://app.netlify.com/sites/ecstatic-hugle-48075c",
     methods: ["GET", "PUT", "POST"],
   },
 });
@@ -55,8 +57,16 @@ io.on("connection", (socket) => {
   socket.on("register", (id) => {
     socket.join(id);
   });
-  socket.on("messageSent", (data) => {
-    socket.to(data.id1).to(data.id2).emit("messageReceived", data.chat);
+  socket.on("registerChats", (chats) => {
+    chats.forEach((chat) => {
+      socket.join(chat._id);
+    });
+  });
+  socket.on("registerChat", (chat) => {
+    socket.join(chat._id);
+  });
+  socket.on("messageSent", (chat) => {
+    socket.to(chat._id).emit("messageReceived", chat);
   });
   socket.on("requestSent", (data) => {
     socket.to(data.id1).to(data.id2._id).emit("requestReceived", data.request);

@@ -8,7 +8,9 @@ const chatSchema = new Schema({
     messages:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Message"
-    }]
+    }],
+    dm:Boolean,
+    name:String
 })
 
 module.exports=mongoose.model('Chat',chatSchema);

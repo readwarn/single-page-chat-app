@@ -17,6 +17,7 @@ router.post('/',async(req,res)=>{
                 }else{
                     newChat.between.push(req.body.between[0]);
                     newChat.between.push(req.body.between[1]);
+                    newChat.dm=true;
                     newChat.save();
                     Chat.populate(newChat,"between",(err,populatedChat)=>{
                         if(!err){
@@ -29,10 +30,25 @@ router.post('/',async(req,res)=>{
      })
 })
 
+router.post('/new',(req,res)=>{
+    Chat.create({
+        name:'Welcome',
+    },(err,newChat)=>{
+        if(!err){
+            res.json(newChat);
+        }
+    })
+})
 router.get('/:userID',(req,res)=>{
     Chat.find({between:req.params.userID})
     .populate('between')
-    .populate('messages')
+    .populate({
+        path:'messages',
+        populate:{
+            path:'owner',
+            model:'User'
+        }
+    })
     .exec(
     (err,chats)=>{
         if(err){
