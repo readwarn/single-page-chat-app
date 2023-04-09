@@ -9,6 +9,10 @@
     {
       "src": "/(.*)",
       "dest": "/"
+    },
+    {
+      "src": "/socket.io",
+      "dest": "http://localhost:3000"
     }
   ]
 }
